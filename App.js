@@ -1,26 +1,23 @@
+import 'react-native-gesture-handler';
+// Note From Docs: If you are building for Android or iOS, do not skip this step, or your app may crash in production even if it works fine in development.
 import React from 'react';
 import { SafeAreaView, Platform, StatusBar, ImageBackground, View, Text } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import {Routes, AppStackNav} from './routes';
+import Home from './screens/home';
+import Recording from './screens/recording';
+import ReminderDetails from './screens/reminderDetails';
 
 export default function App() {
   return (
     <SafeAreaView style={{
-      flex:1, 
-      paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+      flex:1,
+      backgroundColor: '#333333',
       }}>
-        {/* <ReminderDetails /> */}
-        {/* <NavigationContainer>
-          <StackTest />
-        </NavigationContainer> */}
-        <View
-          style={{
-            flex:1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text>Hello from React Native CLI!!!</Text>        
-          <Text>Test Wi-Fi Debugging</Text>        
-          <Text>It is working but not auto-saving</Text>        
-        </View>
+        {/* <ReminderDetails />      */}
+        <NavigationContainer>
+            <AppStackNav />
+          </NavigationContainer>
     </SafeAreaView>
   );
 }
