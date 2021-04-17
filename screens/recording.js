@@ -1,21 +1,107 @@
 /**
  * This screen is for the process of recording and doing the speech to text functionality...
  */
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ImageBackground, Dimensions } from 'react-native';
-// import {ResposiveFontSize} from 'react-native-responsive-dimentsions';
-import { golbalStyles } from '../styles/global';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+
+// Importing Libraries and Packages...
+import Voice from '@react-native-voice/voice'; // Importing the Voice Package...
+import AntDesign from 'react-native-vector-icons/AntDesign'; // Importing Icons...
+
+// Importing local files...
+import { golbalStyles } from '../styles/global'; 
 import RecordButton from '../components/recordButton';
 
 const {width, height} = Dimensions.get('window');
 
 export default function Recording({ navigation }) {
+
+    {/** useRef to reference the tasks text input */}
+    const taskInput = useRef();
+
+    {/** useStates for the text inputs */}
     const [hours, setHours] = useState('');
     const [minutes, setMinutes] = useState('');
     const [task, setTask] = useState('');
     
-    const taskInput = useRef();
+    {/** useStates for the Voice library */}
+    const [error, setError] = useState('');
+
+    {/** useEffect for the Voice library */}
+    useEffect(() => {
+        // Setting Callbacks that are invoked when a native event emitted for the process status...
+        Voice.onSpeechStart = onSpeechStart;
+        Voice.onSpeechEnd = onSpeechEnd;
+        Voice.onSpeechError = onSpeechError;
+        Voice.onSpeechResults = onSpeechResults;
+        Voice.onSpeechPartialResults = onSpeechPartialResults;
+    
+        return () => {
+          // Destroy the process after switching the screen...
+          Voice.destroy().then(Voice.removeAllListeners);
+        };
+    }, []);
+
+    {/** Methods that are linked with the useEffect */}
+    const onSpeechStart = (e) => {
+        // Invoked when .start() is called without errors
+        console.log('onSpeechStart: ', e);
+    };
+    
+    const onSpeechEnd = (e) => {
+    // Invoked when SpeechRecognizer stops recognition
+    console.log('onSpeechEnd: ', e);
+    };
+
+    const onSpeechError = (e) => {
+    // Invoked when an error occurs.
+    console.log('onSpeechError: ', e);
+    setError(JSON.stringify(e.error));
+    };
+
+    const onSpeechResults = (e) => {
+    // Invoked when SpeechRecognizer is finished recognizing
+    console.log('onSpeechResults: ', e);
+    setTask(e.value[0]);
+    };
+
+    const onSpeechPartialResults = (e) => {
+    // Invoked when any results are computed
+    console.log('onSpeechPartialResults: ', e);
+    setTask(e.value[0]);
+    };
+
+    const startRecognizing = async () => {
+        // Starts listening for speech for a specific locale
+        try {
+          await Voice.start('en-US');
+        } catch (e) {
+          // eslint-disable-next-line
+          console.error(e);
+        }
+    };
+
+    const stopRecognizing = async () => {
+        // Stops listening for speech
+        try {
+          await Voice.stop();
+        } catch (e) {
+          // eslint-disable-next-line
+          console.error(e);
+        }
+    };
+    
+
+    const destroyRecognizer = async () => {
+        // Destroys the current SpeechRecognizer instance
+        try {
+          await Voice.destroy();
+        } catch (e) {
+          //eslint-disable-next-line
+          console.error(e);
+        }
+      };
+
 
     return (
         <TouchableWithoutFeedback
@@ -88,8 +174,8 @@ export default function Recording({ navigation }) {
                             </TouchableOpacity>
 
                             <RecordButton 
-                                onPressIn={() => console.log("Pressed In")}
-                                onPressOut={() => console.log("Pressed out")} />
+                                onPressIn={startRecognizing}
+                                onPressOut={stopRecognizing} />
 
                             <TouchableOpacity
                                 style={golbalStyles.shadow}
