@@ -2,7 +2,7 @@
  * This screen is for the process of recording and doing the speech to text functionality...
  */
 import React, {useState, useEffect, useRef} from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ImageBackground, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ImageBackground, Dimensions, Alert } from 'react-native';
 
 // Importing Libraries and Packages...
 import Voice from '@react-native-voice/voice'; // Importing the Voice Package...
@@ -16,18 +16,28 @@ const {width, height} = Dimensions.get('window');
 
 export default function Recording({ navigation }) {
 
-    {/** useRef to reference the tasks text input */}
+    /** ====== useRef to reference the tasks text input ====== */
+    const hoursInput = useRef();
+    const minutesInput = useRef();
     const taskInput = useRef();
 
-    {/** useStates for the text inputs */}
-    const [hours, setHours] = useState('');
-    const [minutes, setMinutes] = useState('');
+    /** ====== useStates for the text inputs ====== */
+    const [hours, setHours] = useState(null);
+    const [minutes, setMinutes] = useState(null);
+    var timer = false;
     const [task, setTask] = useState('');
     
-    {/** useStates for the Voice library */}
+    /** ====== useStates for the Voice library ====== */
     const [error, setError] = useState('');
+    // const [results, setResults] = useState([]);
 
-    {/** useEffect for the Voice library */}
+    /** ======useEffect to start the recording process  ======*/
+    useEffect(() => {
+        // Setting Callbacks that are invoked when a native event emitted for the process status...
+        process();
+    }, []); // The empty array will make sure that the process will run only once...
+
+    /** ====== useEffect for the Voice library ====== */
     useEffect(() => {
         // Setting Callbacks that are invoked when a native event emitted for the process status...
         Voice.onSpeechStart = onSpeechStart;
@@ -42,7 +52,7 @@ export default function Recording({ navigation }) {
         };
     }, []);
 
-    {/** Methods that are linked with the useEffect */}
+    /** ====== Methods that are linked with the useEffect ====== */
     const onSpeechStart = (e) => {
         // Invoked when .start() is called without errors
         console.log('onSpeechStart: ', e);
@@ -62,13 +72,18 @@ export default function Recording({ navigation }) {
     const onSpeechResults = (e) => {
     // Invoked when SpeechRecognizer is finished recognizing
     console.log('onSpeechResults: ', e);
-    setTask(e.value[0]);
+    /* if(!timer){
+        assignTimer(e.value);
+    } else {
+        setTask(e.value[0]);
+    } */
+    !timer ? assignTimer(e.value) : setTask(e.value[0]);
     };
 
     const onSpeechPartialResults = (e) => {
     // Invoked when any results are computed
     console.log('onSpeechPartialResults: ', e);
-    setTask(e.value[0]);
+    //setTask(e.value[0]);
     };
 
     const startRecognizing = async () => {
@@ -100,8 +115,44 @@ export default function Recording({ navigation }) {
           //eslint-disable-next-line
           console.error(e);
         }
-      };
+    };
 
+    /** ====== Recording Functionalities ====== */
+    const process = (results) => {
+        // TODO 1) Read first question... 
+        // TODO 2) Call assignTimer with the results...
+        //assignTimer(results);
+        // ! I don't move into the other section until there is some infos in the timer inputs.
+        // TODO 3) Read second question... 
+        // TODO 4) Call assignTask with results... 
+        // TODO 5) Disable recording button... 
+    }
+
+    const assignTimer = (results) => {
+        // TODO 1) Loop through the results' array and pick the result with colon in it ":"
+        const time = results.filter(result => result.includes(':'));
+        // TODO 2) If the ":" is found, assign, use split or slice, assign the first helf to the hours, and the second half to the minutes.
+        // TODO 3) If not found, alert the user with I couldn't recognise your input, try again please (I may do it as a tts...)...
+        if(time.length > 0){
+            const strTime = time.toString();
+            const splitTime = strTime.split(':');
+            setHours(splitTime[0]);
+            setMinutes(splitTime[1]);
+            timer = true;
+            // TODO 4) Change the state of a variable to true so we could move into the task recording...
+        } else{
+            Alert.alert(
+                "OOPS!",
+                "Sorry, I couldn't recognise your input, please try again!",
+                [
+                    {text: "OK"}
+                ],
+                {
+                  cancelable: true,
+                }
+              );
+        }
+    }
 
     return (
         <TouchableWithoutFeedback
