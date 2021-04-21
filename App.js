@@ -7,6 +7,7 @@ import {Routes, AppStackNav} from './routes';
 import Home from './screens/home';
 import Recording from './screens/recording';
 import ReminderDetails from './screens/reminderDetails';
+import { DateProvider } from './contexts/dateContext';
 
 export default function App() {
   return (
@@ -15,9 +16,11 @@ export default function App() {
       backgroundColor: '#333333',
       }}>
         {/* <ReminderDetails />      */}
-        <NavigationContainer>
-            <AppStackNav />
+        <DateProvider>
+          <NavigationContainer>
+              <AppStackNav />
           </NavigationContainer>
+        </DateProvider>
     </SafeAreaView>
   );
 }
