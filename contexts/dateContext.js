@@ -9,8 +9,10 @@ export const DateProvider = (props) => {
     const date = new Date();
     const currentDay = date.getDate();
     const currentMonth = date.getMonth();
+    const currentYear = date.getFullYear();
     const [day, setDay] = useState(currentDay);
     const [month, setMonth] = useState(currentMonth);
+    const [year, setYear] = useState(currentYear);
 
     return(
         <DateContext.Provider 
@@ -18,9 +20,11 @@ export const DateProvider = (props) => {
                 day,
                 setDay,
                 month,
-                setMonth
+                setMonth,
+                year,
+                setYear
             }}
-        >
+            >
             {props.children}
         </DateContext.Provider>
     )

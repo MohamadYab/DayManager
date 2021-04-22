@@ -30,6 +30,7 @@ export default function Header() {
         setShow(false);
         dateContext.setDay(selectedDate.getDate());
         dateContext.setMonth(selectedDate.getMonth());
+        dateContext.setYear(selectedDate.getFullYear());
     };
 
     const showPicker = () => {
