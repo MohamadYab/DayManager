@@ -1,7 +1,7 @@
 /**
  * Date context to set and change the date of the task for the application...
  */
-import React, {createContext, useState, useEffect} from 'react';
+import React, {createContext, useState} from 'react';
 
 export const DateContext = createContext();
 
