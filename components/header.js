@@ -28,9 +28,8 @@ export default function Header() {
      */
     const onChange = (event, selectedDate) => {
         setShow(false);
-        dateContext.setDay(selectedDate.getDate());
-        dateContext.setMonth(selectedDate.getMonth());
-        dateContext.setYear(selectedDate.getFullYear());
+        setDate(selectedDate);
+        dateContext.setDate(selectedDate);
     };
 
     const showPicker = () => {
@@ -44,7 +43,7 @@ export default function Header() {
                 style={styles.date}
                 onPress={showPicker}>
                 <Text style={styles.dateText}>
-                    {`${dateContext.day}/${monthNames[dateContext.month]}`}
+                    {`${date.getDate()}/${monthNames[date.getMonth()]}`}
                 </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.tutorial}>
