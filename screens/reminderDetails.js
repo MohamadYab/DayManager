@@ -2,24 +2,35 @@
  * This screen will display the information of a clicked reminder...
  * Here, the user woulc be able to complete the tasks... 
  */
- import React from 'react';
+ import React, {useContext} from 'react';
  import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
  import {golbalStyles} from '../styles/global';
  import Ionicons from 'react-native-vector-icons/Ionicons';
+ import {ResourcesContext} from '../contexts/resourcesContext';
 
  const width = Dimensions.get('window').width;
  // const {width, height} = Dimensions.get('window');
 
- export default function ReminderDetails() {
+
+export default function ReminderDetails({route, navigation }) {
+    const {item} = route.params;
+    const resourcesContext = useContext(ResourcesContext);
+
+    const deleteHandler = () => {
+        resourcesContext.deleteRecord(item.id);
+        navigation.pop();
+    }
     return(
         <View style={golbalStyles.container}>
             <ImageBackground source={require('../assets/BG_Gray.png')} style={styles.bgImage} imageStyle={{opacity: 0.28}}>
                 <View style={styles.container} >
-                    <Text style={styles.txtTime} >18/Mar - 12:25</Text>
-                    <Text style={styles.txtTask} >Do the High-Fidelity design</Text>
+                    <Text style={styles.txtTime} >{item.taskTime}</Text>
+                    <Text style={styles.txtTask} >{item.task}</Text>
                     <View style={styles.btnsContainer}>
                         <TouchableOpacity 
-                            style={[styles.completedBtn, golbalStyles.shadow]}>
+                            style={[styles.completedBtn, golbalStyles.shadow]}
+                            onPress={deleteHandler}
+                            >
                             <Text style={styles.btnTxt} >Completed</Text>
                             <Ionicons name="checkmark-done-sharp" size={width * 0.064} color="green" />
                         </TouchableOpacity>

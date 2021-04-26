@@ -1,7 +1,7 @@
 /**
  * This screen is for the process of recording and doing the speech to text functionality...
  */
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ImageBackground, Dimensions, Alert } from 'react-native';
 
 // Importing Libraries and Packages...
@@ -12,9 +12,15 @@ import AntDesign from 'react-native-vector-icons/AntDesign'; // Importing Icons.
 import { golbalStyles } from '../styles/global'; 
 import RecordButton from '../components/recordButton';
 
+// Import Contexts
+import { ResourcesContext } from '../contexts/resourcesContext';
+import { DateContext } from '../contexts/dateContext';
 const {width, height} = Dimensions.get('window');
 
 export default function Recording({ navigation }) {
+
+    const dateContext = useContext(DateContext); 
+    const resourcesContext = useContext(ResourcesContext); 
 
     /** ====== useRef to reference the tasks text input ====== */
     const hoursInput = useRef();
@@ -31,11 +37,6 @@ export default function Recording({ navigation }) {
     const [error, setError] = useState('');
     // const [results, setResults] = useState([]);
 
-    /** ======useEffect to start the recording process  ======*/
-    useEffect(() => {
-        // Setting Callbacks that are invoked when a native event emitted for the process status...
-        process();
-    }, []); // The empty array will make sure that the process will run only once...
 
     /** ====== useEffect for the Voice library ====== */
     useEffect(() => {
@@ -72,18 +73,12 @@ export default function Recording({ navigation }) {
     const onSpeechResults = (e) => {
     // Invoked when SpeechRecognizer is finished recognizing
     console.log('onSpeechResults: ', e);
-    /* if(!timer){
-        assignTimer(e.value);
-    } else {
-        setTask(e.value[0]);
-    } */
     !timer ? assignTimer(e.value) : setTask(e.value[0]);
     };
 
     const onSpeechPartialResults = (e) => {
     // Invoked when any results are computed
-    console.log('onSpeechPartialResults: ', e);
-    //setTask(e.value[0]);
+    timer ? setTask(e.value[0]) : "";
     };
 
     const startRecognizing = async () => {
@@ -107,39 +102,14 @@ export default function Recording({ navigation }) {
     };
     
 
-    const destroyRecognizer = async () => {
-        // Destroys the current SpeechRecognizer instance
-        try {
-          await Voice.destroy();
-        } catch (e) {
-          //eslint-disable-next-line
-          console.error(e);
-        }
-    };
-
-    /** ====== Recording Functionalities ====== */
-    const process = (results) => {
-        // TODO 1) Read first question... 
-        // TODO 2) Call assignTimer with the results...
-        //assignTimer(results);
-        // ! I don't move into the other section until there is some infos in the timer inputs.
-        // TODO 3) Read second question... 
-        // TODO 4) Call assignTask with results... 
-        // TODO 5) Disable recording button... 
-    }
-
     const assignTimer = (results) => {
-        // TODO 1) Loop through the results' array and pick the result with colon in it ":"
         const time = results.filter(result => result.includes(':'));
-        // TODO 2) If the ":" is found, assign, use split or slice, assign the first helf to the hours, and the second half to the minutes.
-        // TODO 3) If not found, alert the user with I couldn't recognise your input, try again please (I may do it as a tts...)...
         if(time.length > 0){
             const strTime = time.toString();
             const splitTime = strTime.split(':');
-            setHours(splitTime[0]);
-            setMinutes(splitTime[1]);
+            splitTime[0] < 10 ? setHours(`0${splitTime[0]}`) : setHours(splitTime[0]);
+            splitTime[1] < 10 ? setHours(`0${splitTime[1]}`) : setMinutes(splitTime[1]);            
             timer = true;
-            // TODO 4) Change the state of a variable to true so we could move into the task recording...
         } else{
             Alert.alert(
                 "OOPS!",
@@ -150,8 +120,14 @@ export default function Recording({ navigation }) {
                 {
                   cancelable: true,
                 }
-              );
+            );
         }
+    }
+
+    const submitHandler = () => {
+        const taskTime = `${hours}:${minutes}`;
+        resourcesContext.insertRecord(taskTime, task);
+        navigation.pop();
     }
 
     return (
@@ -162,7 +138,7 @@ export default function Recording({ navigation }) {
                     <View style={styles.container} >
                         <View style={styles.timeVContainer} >
                             <Text style={styles.questionsText} >
-                                When do you want me to remind you?
+                                1) Reminder Time?
                             </Text>
                             <View style={styles.timerInputContainer}>
                                 <TextInput 
@@ -194,7 +170,7 @@ export default function Recording({ navigation }) {
                         <View style={styles.taskVContainer} >
                             <View>
                                 <Text style={styles.questionsText} >
-                                    What task do you want to record?
+                                    2) Reminder Task?
                                 </Text>
                                     <TouchableWithoutFeedback
                                         onPress={()=> { taskInput.current.focus()} }
@@ -230,7 +206,7 @@ export default function Recording({ navigation }) {
 
                             <TouchableOpacity
                                 style={golbalStyles.shadow}
-                                onPress={() => navigation.pop()}>
+                                onPress={submitHandler}>
                                 <AntDesign name="checkcircle" size={width * 0.17} color="#0FAB69" />
                             </TouchableOpacity>
                         </View>

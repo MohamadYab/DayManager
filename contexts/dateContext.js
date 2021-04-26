@@ -6,11 +6,18 @@ import React, {createContext, useState, useEffect} from 'react';
 export const DateContext = createContext();
 
 export const DateProvider = (props) => {
-    const [fullDate, setFullDate] = useState();
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ]
 
-    useEffect(() => {
-        setDate(new Date())
-    }, []);
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1) < 10 ? `0${(d.getMonth() + 1)}` : (d.getMonth() + 1);
+    const day = d.getDate() < 10 ? `0${d.getDate()}` : d.getDate();
+    const formattingSelectedDate = `${year}-${month}-${day}`;
+    const [fullDate, setFullDate] = useState(formattingSelectedDate);
+    const [strDate, setStrDate] = useState(`${d.getDate()}/${monthNames[d.getMonth()]}`);
+    
 
     const setDate = (selectedDate) => {
         const year = selectedDate.getFullYear();
@@ -25,7 +32,9 @@ export const DateProvider = (props) => {
             value={{
                 fullDate,
                 setFullDate,
-                setDate
+                setDate,
+                strDate,
+                setStrDate,
             }}
             >
             {props.children}

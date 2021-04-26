@@ -11,7 +11,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 const width = Dimensions.get('window').width;
 // const {width, height} = Dimensions.get('window');
 
-export default function Header() {
+export default function Header({ globaDate }) {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ]; // To Display the name of the month to avoid confisions between months and days...
@@ -28,8 +28,10 @@ export default function Header() {
      */
     const onChange = (event, selectedDate) => {
         setShow(false);
-        setDate(selectedDate);
-        dateContext.setDate(selectedDate);
+        const currentDate = selectedDate || date; // Prevent Error when no date is changed or selected...
+        setDate(currentDate);
+        dateContext.setDate(currentDate);
+        dateContext.setStrDate(`${currentDate.getDate()}/${monthNames[currentDate.getMonth()]}`);
     };
 
     const showPicker = () => {
@@ -43,7 +45,8 @@ export default function Header() {
                 style={styles.date}
                 onPress={showPicker}>
                 <Text style={styles.dateText}>
-                    {`${date.getDate()}/${monthNames[date.getMonth()]}`}
+                    {/* {`${date.getDate()}/${monthNames[date.getMonth()]}`} */}
+                    {globaDate}
                 </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.tutorial}>

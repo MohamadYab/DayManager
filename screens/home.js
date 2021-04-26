@@ -1,50 +1,46 @@
 /**
  * This screen is the home screen
  */
-import React from 'react';
+import React, {useContext} from 'react';
 import { StyleSheet, View, Text, FlatList, Alert, ImageBackground, Dimensions, TouchableOpacity } from 'react-native';
 import {golbalStyles} from '../styles/global';
 import ReminderItem from '../components/reminderItem';
+import { ResourcesContext } from '../contexts/resourcesContext';
 
-const width = Dimensions.get('window').width;
+const width = Dimensions.get('window').width; // Get the widh of the mobile device...
 // const {width, height} = Dimensions.get('window');
 
 export default function Home({navigation}) {
-    const x = 1;
+    const resourcesContext = useContext(ResourcesContext); 
     return(
         <View style={golbalStyles.container}>
         <ImageBackground source={require('../assets/BG_Gray.png')} style={{flex:1}} imageStyle={{opacity: 0.28}}>
             <View style={styles.container}>
-                {/**
-                 * I need to add a flatlist that holds reminderItem Component...
-                 * The items of this flatlist can be scrolled (flatlist comes with the ability to scroll through elements by default)...
-                 * The data of this flat list will change based on the date and the items in the date...
-                 * Instead of creating all the list, whenever the user adds a reminder, It will be added with a date, When selecting a date -
-                 * - I would use the array.map function to map all matching dates and display them. If there is no matching date, I would display the no reminder text...
-                 * I need to have a date property, and use the time as a key to the flatlist. When this time passes, the reminder would push a notification to the user...
-                 * I must have a time limit where all the reminders past this time must be deleted to not waste space and memory...
-                 * I need to research permissions...
-                 * I need to research GDPR Policies and etc about permissions...
-                 * I must keep this comment to benefit from it when developing the application...
-                 */}
-                {/** Here I all the list of the reminderItem Components... */}
-                {x === 0 ? 
-                <View style={styles.hintTextContainer}>
-                    <Text style={styles.hintTextL1}>Use your voice to manage your day!</Text>
-                    <Text style={styles.hintTextL2}>Add new tasks and get more organised!</Text>
+                <View style={{flex:8}}>
+                    {resourcesContext.tasks <= 0 ? 
+                        <View style={styles.hintTextContainer}>
+                            <Text style={styles.hintTextL1}>Use your voice to manage your day!</Text>
+                            <Text style={styles.hintTextL2}>Add new tasks and get more organised!</Text>
+                        </View>
+                        : <FlatList
+                            style={styles.hintTextContainer}
+                            keyExtractor={(item) => item.id}
+                            data={resourcesContext.tasks} 
+                            renderItem={({item}) => 
+                            {
+                                return (
+                                    <ReminderItem title={item.taskTime} onPress={()=> navigation.navigate('ReminderDetails', {item})} />
+                                )
+                            }}
+                        />
+                    }
                 </View>
-                : <ReminderItem />}
-                {/* <FlatList 
-                    renderItem={({item}) => {
-                        <ReminderItem />
-                    }}
-                    /> */}
-            <View style={styles.addRecordingBtnContainer}>
-                <TouchableOpacity style={[styles.addRecordingBtn, golbalStyles.shadow]}
-                    onPress={() => navigation.push('Recording')}>
-                    <Text style={styles.addRecordingBtnTxt}>Add</Text>
-                </TouchableOpacity>
-            </View>
+                <View style={styles.addRecordingBtnContainer}>
+                    <TouchableOpacity style={[styles.addRecordingBtn, golbalStyles.shadow]}
+                        onPress={() => navigation.push('Recording')}>
+                        <Text style={styles.addRecordingBtnTxt}>Add</Text>
+                    </TouchableOpacity>
+                </View>
         </View>
     </ImageBackground>
     </View>
@@ -71,9 +67,9 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     addRecordingBtnContainer: {
+        flex: 2,
         width: '100%',
-        position: 'absolute',
-        bottom: '5%',
+        justifyContent:'center',
     },
     addRecordingBtn: {
         backgroundColor: '#5A5757',

@@ -8,12 +8,12 @@ import { golbalStyles } from '../styles/global';
 
  const {width, height} = Dimensions.get('window');
 
-export default function ReminderItem ({onPress}) {
+export default function ReminderItem ({onPress, title}) {
     return (
         <TouchableOpacity 
             style={[styles.container, golbalStyles.shadow]}
             onPress={onPress}>
-            <Text style={styles.text}>Task Title</Text>
+            <Text style={styles.text}>{title}</Text>
         </TouchableOpacity>
     )
 }
@@ -23,8 +23,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#5A5757',
         justifyContent: 'center',
         height: 60,
-        width: width,
+        width: width * 0.9,
         borderRadius: 15,
+        marginVertical: 15,
       },
     text: {
         color: '#ffffff',

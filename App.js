@@ -8,6 +8,7 @@ import Home from './screens/home';
 import Recording from './screens/recording';
 import ReminderDetails from './screens/reminderDetails';
 import { DateProvider } from './contexts/dateContext';
+import { ResourcesProvider } from './contexts/resourcesContext';
 
 export default function App() {
   return (
@@ -17,9 +18,11 @@ export default function App() {
       }}>
         {/* <ReminderDetails />      */}
         <DateProvider>
-          <NavigationContainer>
-              <AppStackNav />
-          </NavigationContainer>
+          <ResourcesProvider>
+            <NavigationContainer>
+                <AppStackNav />
+            </NavigationContainer>
+          </ResourcesProvider>
         </DateProvider>
     </SafeAreaView>
   );
