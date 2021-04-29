@@ -27,6 +27,10 @@ export const DateProvider = (props) => {
         setFullDate(formattingSelectedDate);
     }
 
+    const setStringDate = (selectedDate) => {
+        setStrDate(`${selectedDate.getDate()}/${monthNames[selectedDate.getMonth()]}`);
+    }
+
     return(
         <DateContext.Provider 
             value={{
@@ -34,7 +38,7 @@ export const DateProvider = (props) => {
                 setFullDate,
                 setDate,
                 strDate,
-                setStrDate,
+                setStringDate,
             }}
             >
             {props.children}

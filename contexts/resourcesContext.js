@@ -13,6 +13,7 @@ export const ResourcesProvider = (props) => {
     const dateContext = useContext(DateContext); 
 
     const [tasks, setTasks] = useState([]);    
+    const [insertedRecordID, setInsertedRecordID] = useState();    
 
     useEffect(() => {
         selectQuery();
@@ -37,8 +38,8 @@ export const ResourcesProvider = (props) => {
         let params = [dateContext.fullDate, taskTime, task];
         db.transaction((tx) => {
             tx.executeSql(query, params, (tx, results) => {
-                alert("Success, It has been saved");
                 setTasks(prevTasks => [...prevTasks, {"id": results.insertId, taskDate: dateContext.fullDate, taskTime, task}]);
+                setInsertedRecordID(results.insertId);
                 selectQuery();
             });
         });
@@ -47,8 +48,6 @@ export const ResourcesProvider = (props) => {
     const deleteRecord = (id) => {
         db.transaction((tx) => {
             tx.executeSql('DELETE FROM DayManager WHERE id = ?', [id], (tx, results) => {
-                //console.log(results.rows.row);
-                alert("Success, It has been removed");
                 selectQuery();
             });
         });
@@ -61,6 +60,7 @@ export const ResourcesProvider = (props) => {
             value={{
             tasks,
             insertRecord,
+            insertedRecordID,
             deleteRecord
             }}
             >

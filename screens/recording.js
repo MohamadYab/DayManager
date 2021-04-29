@@ -7,6 +7,8 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFe
 // Importing Libraries and Packages...
 import Voice from '@react-native-voice/voice'; // Importing the Voice Package...
 import AntDesign from 'react-native-vector-icons/AntDesign'; // Importing Icons...
+import PushNotification from "react-native-push-notification";
+
 
 // Importing local files...
 import { golbalStyles } from '../styles/global'; 
@@ -41,8 +43,6 @@ export default function Recording({ navigation }) {
     /** ====== useEffect for the Voice library ====== */
     useEffect(() => {
         // Setting Callbacks that are invoked when a native event emitted for the process status...
-        Voice.onSpeechStart = onSpeechStart;
-        Voice.onSpeechEnd = onSpeechEnd;
         Voice.onSpeechError = onSpeechError;
         Voice.onSpeechResults = onSpeechResults;
         Voice.onSpeechPartialResults = onSpeechPartialResults;
@@ -52,17 +52,6 @@ export default function Recording({ navigation }) {
           Voice.destroy().then(Voice.removeAllListeners);
         };
     }, []);
-
-    /** ====== Methods that are linked with the useEffect ====== */
-    const onSpeechStart = (e) => {
-        // Invoked when .start() is called without errors
-        console.log('onSpeechStart: ', e);
-    };
-    
-    const onSpeechEnd = (e) => {
-    // Invoked when SpeechRecognizer stops recognition
-    console.log('onSpeechEnd: ', e);
-    };
 
     const onSpeechError = (e) => {
     // Invoked when an error occurs.
@@ -86,7 +75,6 @@ export default function Recording({ navigation }) {
         try {
           await Voice.start('en-US');
         } catch (e) {
-          // eslint-disable-next-line
           console.error(e);
         }
     };
@@ -96,21 +84,55 @@ export default function Recording({ navigation }) {
         try {
           await Voice.stop();
         } catch (e) {
-          // eslint-disable-next-line
           console.error(e);
         }
     };
     
 
     const assignTimer = (results) => {
-        const time = results.filter(result => result.includes(':'));
-        if(time.length > 0){
-            const strTime = time.toString();
-            const splitTime = strTime.split(':');
-            splitTime[0] < 10 ? setHours(`0${splitTime[0]}`) : setHours(splitTime[0]);
-            splitTime[1] < 10 ? setHours(`0${splitTime[1]}`) : setMinutes(splitTime[1]);            
-            timer = true;
-        } else{
+        // TODO The best way is to let the user enter the time by saying the four numbers of the timer (one, two, three, four), instead of using various formats...
+        
+        for(const result of results) {
+            if(result.length === 4) {
+                console.log("from 4 "+result);
+                setHours(result.slice(0, 2));
+                setMinutes(result.slice(2, 4));
+                timer = true;
+                return;
+            }
+            console.log(result);
+            if(result.includes(':')){
+                const time = result.toString();
+                const splitTime = time.split(':');
+                console.log(splitTime);
+                splitTime[0] < 10 ? setHours(`0${splitTime[0]}`) : setHours(splitTime[0]);
+                setMinutes(splitTime[1]);            
+                timer = true;
+                return;
+            }
+
+            if(result.includes(' past ')){
+                const time = result.toString();
+                const splitTime = time.split(' past ');
+                console.log(splitTime);
+                splitTime[1] < 10 ? setHours(`0${splitTime[1]}`) : setHours(splitTime[1]);
+                splitTime[0] < 10 ? setMinutes(`0${splitTime[0]}`) : setMinutes(splitTime[0]);            
+                timer = true;
+                return;
+            }
+
+            if(result.includes(' to ')){
+                const time = result.toString();
+                const splitTime = time.split(' to ');
+                console.log(splitTime);
+                splitTime[1] < 10 ? setHours(`0${splitTime[1]}`) : setHours(splitTime[1]);
+                splitTime[0] < 10 ? setMinutes(`0${splitTime[0]}`) : setMinutes(splitTime[0]);           
+                timer = true;
+                return;
+            }
+        }
+
+        if(!timer){
             Alert.alert(
                 "OOPS!",
                 "Sorry, I couldn't recognise your input, please try again!",
@@ -124,9 +146,50 @@ export default function Recording({ navigation }) {
         }
     }
 
+    const handleScheduledNotification = () => {
+        const date = new Date(dateContext.fullDate + 'T' + hours + ':' + minutes + ':00Z');
+        date.setTime( date.getTime() + date.getTimezoneOffset()*60*1000 );
+        PushNotification.localNotificationSchedule({
+            channelId: "default-channel-id",
+            title: "New task is due!",
+            message: "Click for more information...",
+            date: date,
+        });
+    }
+
     const submitHandler = () => {
+        if(task === null || hours === null || minutes === null ) {
+            Alert.alert(
+                "OOPS!",
+                "Sorry, one or more inputs are empty!",
+                [
+                    {text: "OK"}
+                ],
+                {
+                  cancelable: true,
+                }
+            );
+            return;
+        }
+
+        if(isNaN(hours) || isNaN(minutes)){
+            Alert.alert(
+                "OOPS!",
+                `Hours and Minutes must contain numbers only!
+Delete any character that is not a number, or cancel the task and re-open it again!`,
+                [
+                    {text: "OK"}
+                ],
+                {
+                  cancelable: true,
+                }
+            );
+            return;
+        }
+
         const taskTime = `${hours}:${minutes}`;
         resourcesContext.insertRecord(taskTime, task);
+        handleScheduledNotification();
         navigation.pop();
     }
 

@@ -6,12 +6,14 @@ import { StyleSheet, View, Text, FlatList, Alert, ImageBackground, Dimensions, T
 import {golbalStyles} from '../styles/global';
 import ReminderItem from '../components/reminderItem';
 import { ResourcesContext } from '../contexts/resourcesContext';
+import { DateContext } from '../contexts/dateContext';
 
 const width = Dimensions.get('window').width; // Get the widh of the mobile device...
 // const {width, height} = Dimensions.get('window');
 
 export default function Home({navigation}) {
-    const resourcesContext = useContext(ResourcesContext); 
+    const resourcesContext = useContext(ResourcesContext);
+    const dateContext = useContext(DateContext);
     return(
         <View style={golbalStyles.container}>
         <ImageBackground source={require('../assets/BG_Gray.png')} style={{flex:1}} imageStyle={{opacity: 0.28}}>
@@ -29,18 +31,23 @@ export default function Home({navigation}) {
                             renderItem={({item}) => 
                             {
                                 return (
-                                    <ReminderItem title={item.taskTime} onPress={()=> navigation.navigate('ReminderDetails', {item})} />
+                                    <ReminderItem taskTime={item.taskTime} taskDate={item.taskDate} onPress={()=> navigation.navigate('ReminderDetails', {item})} />
                                 )
                             }}
                         />
                     }
                 </View>
-                <View style={styles.addRecordingBtnContainer}>
-                    <TouchableOpacity style={[styles.addRecordingBtn, golbalStyles.shadow]}
-                        onPress={() => navigation.push('Recording')}>
-                        <Text style={styles.addRecordingBtnTxt}>Add</Text>
-                    </TouchableOpacity>
-                </View>
+                {
+                    (new Date() < new Date(dateContext.fullDate+ "T23:59:59Z")) ?  
+                        <View style={styles.addRecordingBtnContainer}>
+                            <TouchableOpacity style={[styles.addRecordingBtn, golbalStyles.shadow]}
+                                onPress={() => navigation.push('Recording')}>
+                                <Text style={styles.addRecordingBtnTxt}>Add</Text>
+                            </TouchableOpacity>
+                        </View> 
+                : <View />
+                }
+                
         </View>
     </ImageBackground>
     </View>

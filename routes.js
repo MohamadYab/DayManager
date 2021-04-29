@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Recording from "./screens/recording";
 import Home from "./screens/home";
 import ReminderDetails from "./screens/reminderDetails";
+import Tutorial from "./screens/tutorial";
 import Header from "./components/header";
 import { DateContext } from './contexts/dateContext';
 
@@ -22,6 +23,7 @@ export function AppStackNav() {
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Recording" component={Recording} />
             <Stack.Screen name="ReminderDetails" component={ReminderDetails} />
+            <Stack.Screen name="Tutorial" component={Tutorial} />
         </Stack.Navigator>
   );
 }

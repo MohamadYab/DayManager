@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import {StyleSheet, View, TouchableOpacity, Text, Dimensions  } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 // Importing the info icon for the tutorial...
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -12,9 +13,8 @@ const width = Dimensions.get('window').width;
 // const {width, height} = Dimensions.get('window');
 
 export default function Header({ globaDate }) {
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ]; // To Display the name of the month to avoid confisions between months and days...
+    const navigation = useNavigation();
+
     const dateContext = useContext(DateContext); // Getting the context of dateContext values...
 
     const [show, setShow] = useState(false); // Setting the date picker visability...
@@ -31,7 +31,7 @@ export default function Header({ globaDate }) {
         const currentDate = selectedDate || date; // Prevent Error when no date is changed or selected...
         setDate(currentDate);
         dateContext.setDate(currentDate);
-        dateContext.setStrDate(`${currentDate.getDate()}/${monthNames[currentDate.getMonth()]}`);
+        dateContext.setStringDate(currentDate);
     };
 
     const showPicker = () => {
@@ -45,11 +45,12 @@ export default function Header({ globaDate }) {
                 style={styles.date}
                 onPress={showPicker}>
                 <Text style={styles.dateText}>
-                    {/* {`${date.getDate()}/${monthNames[date.getMonth()]}`} */}
                     {globaDate}
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.tutorial}>
+            <TouchableOpacity 
+                style={styles.tutorial}
+                onPress={() => navigation.navigate('Tutorial')}>
                 <AntDesign name="infocirlce" size={width * 0.064} color="#E5E5E5" />
             </TouchableOpacity>
             {show && (
@@ -57,6 +58,7 @@ export default function Header({ globaDate }) {
                 testID="dateTimePicker"
                 value={date}
                 onChange={onChange}
+                minimumDate={new Date().getDate()}
                 />
             )}
         </View>
