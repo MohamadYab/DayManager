@@ -2,7 +2,7 @@
  * This screen is for the process of recording and doing the speech to text functionality...
  */
 import React, {useState, useEffect, useRef, useContext} from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ImageBackground, Dimensions, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ImageBackground, Dimensions, Alert, PermissionsAndroid } from 'react-native';
 
 // Importing Libraries and Packages...
 import Voice from '@react-native-voice/voice'; // Importing the Voice Package...
@@ -25,8 +25,6 @@ export default function Recording({ navigation }) {
     const resourcesContext = useContext(ResourcesContext); 
 
     /** ====== useRef to reference the tasks text input ====== */
-    const hoursInput = useRef();
-    const minutesInput = useRef();
     const taskInput = useRef();
 
     /** ====== useStates for the text inputs ====== */
@@ -72,6 +70,8 @@ export default function Recording({ navigation }) {
 
     const startRecognizing = async () => {
         // Starts listening for speech for a specific locale
+        requestCameraPermission();
+
         try {
           await Voice.start('en-US');
         } catch (e) {
@@ -88,25 +88,55 @@ export default function Recording({ navigation }) {
         }
     };
     
-
-    const assignTimer = (results) => {
-        // TODO The best way is to let the user enter the time by saying the four numbers of the timer (one, two, three, four), instead of using various formats...
-        
-        for(const result of results) {
-            if(result.length === 4) {
-                console.log("from 4 "+result);
-                setHours(result.slice(0, 2));
-                setMinutes(result.slice(2, 4));
-                timer = true;
-                return;
+    const requestCameraPermission = async () => {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+            {
+              title: "DayManager App Microphone Permission",
+              message:
+                "DayManager App needs access to your Microphone  " +
+                "so you can record your tasks.",
+              buttonNeutral: "Ask Me Later",
+              buttonNegative: "Cancel",
+              buttonPositive: "OK"
             }
-            console.log(result);
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            return;
+          } else {
+            Alert.alert(
+                "Permission denied!",
+                `You must give permission to use the microphone to be able to record new tasks!
+You can enable the permissions again by going to setting, apps, DayManager...`,
+                [
+                    {text: "OK"}
+                ],
+                {
+                  cancelable: true,
+                }
+            );
+          }
+        } catch (err) {
+          console.warn(err);
+        }
+    };     
+
+    const assignTimer = (results) => {        
+        for(const result of results) {
             if(result.includes(':')){
                 const time = result.toString();
                 const splitTime = time.split(':');
                 console.log(splitTime);
                 splitTime[0] < 10 ? setHours(`0${splitTime[0]}`) : setHours(splitTime[0]);
                 setMinutes(splitTime[1]);            
+                timer = true;
+                return;
+            }
+
+            if(result.length === 4) {
+                setHours(result.slice(0, 2));
+                setMinutes(result.slice(2, 4));
                 timer = true;
                 return;
             }
@@ -177,6 +207,23 @@ export default function Recording({ navigation }) {
                 "OOPS!",
                 `Hours and Minutes must contain numbers only!
 Delete any character that is not a number, or cancel the task and re-open it again!`,
+                [
+                    {text: "OK"}
+                ],
+                {
+                  cancelable: true,
+                }
+            );
+            return;
+        }
+
+        const date = new Date();
+        date.setTime( date.getTime() - new Date().getTimezoneOffset()*60*1000 );
+        const selectedTime = new Date(dateContext.fullDate + 'T' + hours + ':' + minutes + ':00Z');
+        if(selectedTime < date){
+            Alert.alert(
+                "OOPS!",
+                `You can not set task for older time!`,
                 [
                     {text: "OK"}
                 ],
