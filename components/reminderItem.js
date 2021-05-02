@@ -10,9 +10,9 @@ const {width, height} = Dimensions.get('window');
 
 export default function ReminderItem ({onPress, taskTime, taskDate}) {
     const date = new Date();
-    date.setTime( date.getTime() - new Date().getTimezoneOffset()*60*1000 );
+    date.setTime( date.getTime() - new Date().getTimezoneOffset()*60*1000 ); // This is to fix the summer time issue...
 
-    const taskDateCheck = new Date(taskDate + "T" + taskTime + ":00Z");
+    const taskDateCheck = new Date(taskDate + "T" + taskTime + ":00Z"); // This is to check if the task is Due or not...
     return (
         <TouchableOpacity 
             style={[styles.container, golbalStyles.shadow]}

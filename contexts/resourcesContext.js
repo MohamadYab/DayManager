@@ -15,11 +15,11 @@ export const ResourcesProvider = (props) => {
     const [tasks, setTasks] = useState([]);    
     const [insertedRecordID, setInsertedRecordID] = useState();    
 
-    useEffect(() => {
+    useEffect(() => { // Selecting the date to be displayed. The app will re-render whenever the date changes, and the data will change to match the selected date...
         selectQuery();
     }, [dateContext.fullDate]);
 
-    const selectQuery = () => {
+    const selectQuery = () => { // Select query to select data from the database based on the selected date in the header...
         db.transaction((tx) => {
             tx.executeSql('SELECT * FROM DayManager WHERE taskDate=? ORDER BY taskTime', [dateContext.fullDate], (tx, result) => {
                 var rows = result.rows;
@@ -33,7 +33,7 @@ export const ResourcesProvider = (props) => {
         }); 
     }
 
-    const insertRecord = (taskTime, task) => {
+    const insertRecord = (taskTime, task) => { // Inserting new records in the database...
         const query = 'INSERT INTO DayManager (taskDate, taskTime, task) VALUES (?,?,?)';
         let params = [dateContext.fullDate, taskTime, task];
         db.transaction((tx) => {
@@ -45,7 +45,7 @@ export const ResourcesProvider = (props) => {
         });
     }
 
-    const deleteRecord = (id) => {
+    const deleteRecord = (id) => { // Deleting a record from the database...
         db.transaction((tx) => {
             tx.executeSql('DELETE FROM DayManager WHERE id = ?', [id], (tx, results) => {
                 selectQuery();
@@ -57,7 +57,7 @@ export const ResourcesProvider = (props) => {
 
     return(
         <ResourcesContext.Provider 
-            value={{
+            value={{ // Importing variables, states, and functions...
             tasks,
             insertRecord,
             insertedRecordID,

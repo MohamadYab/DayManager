@@ -1,5 +1,6 @@
 /**
  * @format
+ * The first file to be accessed by the mobile phone...
  */
 
 import {AppRegistry} from 'react-native';
@@ -9,6 +10,7 @@ import PushNotification from "react-native-push-notification";
 import {Platform} from 'react-native';
 
 // It is important that this PushNotification.configure is used in the Highest File (index.js) and is not used inside any component or any component LifeCycle...
+// This PushNotification.configure is used to do the push notification functionality...
 PushNotification.configure({
   // (required) Called when a remote is received or opened, or local notification is opened
   onNotification: function (notification) {
@@ -24,6 +26,7 @@ PushNotification.configure({
    requestPermissions: Platform.OS === 'ios',
 });
 
+// PushNotification.createChannel Will create a channel for the notifications of this application. If the channel does not exist, notifications will not be desplayed...
 PushNotification.createChannel(
   {
     channelId: "default-channel-id", // (required)
@@ -35,4 +38,5 @@ PushNotification.createChannel(
   },
 );
 
+// The AppRegistry to call the App Component...
 AppRegistry.registerComponent(appName, () => App);

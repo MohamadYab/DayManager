@@ -9,16 +9,14 @@
  import {ResourcesContext} from '../contexts/resourcesContext';
 
  const width = Dimensions.get('window').width;
- // const {width, height} = Dimensions.get('window');
-
 
 export default function ReminderDetails({route, navigation }) {
-    const {item} = route.params;
+    const {item} = route.params; // Destructuring the parameters supplied to the reminderDetails component...
     const resourcesContext = useContext(ResourcesContext);
 
-    const deleteHandler = () => {
-        resourcesContext.deleteRecord(item.id);
-        navigation.pop();
+    const deleteHandler = () => { // Handle completing a task...
+        resourcesContext.deleteRecord(item.id); // Calling the delete function from the resources context...
+        navigation.pop(); // Popping the screen back to the Home screen...
     }
     return(
         <View style={golbalStyles.container}>

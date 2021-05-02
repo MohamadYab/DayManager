@@ -34,7 +34,7 @@ export default function Header({ globaDate }) {
         dateContext.setStringDate(currentDate);
     };
 
-    const showPicker = () => {
+    const showPicker = () => { // Shwoing the date picker box...
         setShow(true);
     };
 

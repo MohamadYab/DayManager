@@ -2,7 +2,7 @@
  * Creating a global style that can be used and applied for the entire application.
  * This would reduce code douplicates...
  */
-import {StyleSheet, Platform, StatusBar} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 
 export const golbalStyles = StyleSheet.create({
